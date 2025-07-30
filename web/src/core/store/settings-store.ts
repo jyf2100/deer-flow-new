@@ -96,7 +96,7 @@ export const getChatStreamSettings = () => {
       servers: mcpServers.reduce((acc, cur) => {
         const { transport, env } = cur;
         let server: SimpleMCPServerMetadata;
-        if (transport === "stdio") {
+        if (transport === "stdio" && 'command' in cur) {
           server = {
             name: cur.name,
             transport,
@@ -104,13 +104,15 @@ export const getChatStreamSettings = () => {
             command: cur.command,
             args: cur.args,
           };
-        } else {
+        } else if ('url' in cur) {
           server = {
             name: cur.name,
             transport,
             env,
             url: cur.url,
           };
+        } else {
+          throw new Error("Invalid MCP server configuration");
         }
         return {
           ...acc,
